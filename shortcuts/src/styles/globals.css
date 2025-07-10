@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+	--font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+@layer base {
+	:root {
+		/* These will be dynamically set by the theme system */
+		/* Default light theme colors as fallback */
+		--color-background-primary: #f9fafb;
+		--color-background-secondary: #ffffff;
+		--color-background-tertiary: #f3f4f6;
+		--color-background-inverse: #111827;
+
+		--color-foreground-primary: #111827;
+		--color-foreground-secondary: #4b5563;
+		--color-foreground-tertiary: #6b7280;
+		--color-foreground-inverse: #f9fafb;
+
+		--color-border-primary: #e5e7eb;
+		--color-border-secondary: #e5e7eb;
+		--color-border-tertiary: #f3f4f6;
+		--color-border-focus: #3b82f6;
+
+		/* Map to shadcn variables for compatibility */
+		--background: var(--color-background-primary);
+		--foreground: var(--color-foreground-primary);
+		--card: var(--color-background-secondary);
+		--card-foreground: var(--color-foreground-primary);
+		--popover: var(--color-background-secondary);
+		--popover-foreground: var(--color-foreground-primary);
+		--primary: var(--color-foreground-primary);
+		--primary-foreground: var(--color-background-primary);
+		--secondary: var(--color-background-tertiary);
+		--secondary-foreground: var(--color-foreground-primary);
+		--muted: var(--color-background-tertiary);
+		--muted-foreground: var(--color-foreground-secondary);
+		--accent: var(--color-background-tertiary);
+		--accent-foreground: var(--color-foreground-primary);
+		--destructive: var(--color-state-error);
+		--destructive-foreground: var(--color-foreground-inverse);
+		--border: var(--color-border-primary);
+		--input: var(--color-border-primary);
+		--ring: var(--color-border-focus);
+		--radius: 0.5rem;
+	}
+
+	/* Utility classes for our design system */
+	.transition-theme {
+		transition-property: color, background-color, border-color,
+			text-decoration-color, fill, stroke;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 200ms;
+	}
+}
+
+/* Custom utility classes */
+@layer utilities {
+	/* Spacing utilities that map to our design tokens */
+	.p-card {
+		padding: 1rem; /* spacing.4 */
+	}
+
+	.gap-section {
+		gap: 1.5rem; /* spacing.6 */
+	}
+
+	/* Text utilities */
+	.text-primary {
+		color: var(--color-foreground-primary);
+	}
+
+	.text-secondary {
+		color: var(--color-foreground-secondary);
+	}
+
+	.text-tertiary {
+		color: var(--color-foreground-tertiary);
+	}
+
+	/* Background utilities */
+	.bg-primary {
+		background-color: var(--color-background-primary);
+	}
+
+	.bg-secondary {
+		background-color: var(--color-background-secondary);
+	}
+
+	.bg-tertiary {
+		background-color: var(--color-background-tertiary);
+	}
+
+	/* Border utilities */
+	.border-primary {
+		border-color: var(--color-border-primary);
+	}
+
+	.border-secondary {
+		border-color: var(--color-border-secondary);
+	}
+
+	/* State utilities */
+	.bg-hover {
+		background-color: var(--color-state-hover);
+	}
+
+	.bg-active {
+		background-color: var(--color-state-active);
+	}
+
+	.bg-selected {
+		background-color: var(--color-state-selected);
+	}
+}

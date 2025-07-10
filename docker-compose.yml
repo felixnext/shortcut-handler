@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  shortcuts:
+    build: 
+      context: ./shortcuts
+      dockerfile: Dockerfile
+    container_name: keyboard-shortcuts
+    ports:
+      - "8042:3000"
+    volumes:
+      - ./shortcuts-data:/app/data
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
