@@ -5,10 +5,11 @@ import type { Shortcut, ToolFile } from "~/types/shortcuts";
 // GET /api/shortcuts/[tool] - Get a specific tool's shortcuts
 export async function GET(
 	request: Request,
-	{ params }: { params: { tool: string } },
+	{ params }: { params: Promise<{ tool: string }> },
 ) {
 	try {
-		const tool = await loadTool(params.tool);
+		const { tool: toolName } = await params;
+		const tool = await loadTool(toolName);
 		if (!tool) {
 			return NextResponse.json({ error: "Tool not found" }, { status: 404 });
 		}
@@ -22,13 +23,14 @@ export async function GET(
 // PUT /api/shortcuts/[tool] - Update a tool's shortcuts
 export async function PUT(
 	request: Request,
-	{ params }: { params: { tool: string } },
+	{ params }: { params: Promise<{ tool: string }> },
 ) {
 	try {
 		const body = await request.json();
 		const toolFile = body as ToolFile;
+		const { tool } = await params;
 
-		await saveTool(params.tool, toolFile);
+		await saveTool(tool, toolFile);
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
@@ -40,14 +42,15 @@ export async function PUT(
 // POST /api/shortcuts/[tool] - Create a new shortcut for a tool
 export async function POST(
 	request: Request,
-	{ params }: { params: { tool: string } },
+	{ params }: { params: Promise<{ tool: string }> },
 ) {
 	try {
 		const body = await request.json();
 		const newShortcut = body as Shortcut;
+		const { tool } = await params;
 
 		// Load the tool
-		const toolFile = await loadTool(params.tool);
+		const toolFile = await loadTool(tool);
 		if (!toolFile) {
 			return NextResponse.json({ error: "Tool not found" }, { status: 404 });
 		}
@@ -56,7 +59,7 @@ export async function POST(
 		toolFile.shortcuts.push(newShortcut);
 
 		// Save the tool
-		await saveTool(params.tool, toolFile);
+		await saveTool(tool, toolFile);
 
 		return NextResponse.json({ success: true, shortcut: newShortcut });
 	} catch (error) {
@@ -71,10 +74,11 @@ export async function POST(
 // DELETE /api/shortcuts/[tool] - Delete a tool
 export async function DELETE(
 	request: Request,
-	{ params }: { params: { tool: string } },
+	{ params }: { params: Promise<{ tool: string }> },
 ) {
 	try {
-		await deleteTool(params.tool);
+		const { tool } = await params;
+		await deleteTool(tool);
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error("Error deleting tool:", error);

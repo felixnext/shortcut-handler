@@ -3,16 +3,15 @@ import path from "node:path";
 import * as yaml from "js-yaml";
 import { NextResponse } from "next/server";
 import type { ToolFile } from "~/types/shortcuts";
-
-const DATA_DIR = path.join(process.cwd(), "data", "shortcuts");
+import { SHORTCUTS_DIR, METADATA_FILE } from "~/lib/paths";
 
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
 		const importData = body as Record<string, string>;
 
-		// Ensure data directory exists
-		await fs.mkdir(DATA_DIR, { recursive: true });
+		// Ensure shortcuts directory exists
+		await fs.mkdir(SHORTCUTS_DIR, { recursive: true });
 
 		// Validate the import data
 		for (const [filename, content] of Object.entries(importData)) {
@@ -23,9 +22,11 @@ export async function POST(request: Request) {
 				);
 			}
 
-			// Try to parse the YAML to validate it
+			// Try to parse the YAML to validate it (skip metadata.yaml)
 			try {
-				yaml.load(content) as ToolFile;
+				if (filename !== "metadata.yaml") {
+					yaml.load(content) as ToolFile;
+				}
 			} catch (error) {
 				return NextResponse.json(
 					{ error: `Invalid YAML in file ${filename}: ${error}` },
@@ -36,14 +37,14 @@ export async function POST(request: Request) {
 
 		// Backup existing files
 		const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-		const backupDir = path.join(DATA_DIR, `backup-${timestamp}`);
+		const backupDir = path.join(SHORTCUTS_DIR, `backup-${timestamp}`);
 		await fs.mkdir(backupDir, { recursive: true });
 
 		// Move existing files to backup
-		const existingFiles = await fs.readdir(DATA_DIR);
+		const existingFiles = await fs.readdir(SHORTCUTS_DIR);
 		for (const file of existingFiles) {
 			if (file.endsWith(".yaml")) {
-				const oldPath = path.join(DATA_DIR, file);
+				const oldPath = path.join(SHORTCUTS_DIR, file);
 				const newPath = path.join(backupDir, file);
 				await fs.rename(oldPath, newPath);
 			}
@@ -51,8 +52,14 @@ export async function POST(request: Request) {
 
 		// Write the imported files
 		for (const [filename, content] of Object.entries(importData)) {
-			const filePath = path.join(DATA_DIR, filename);
-			await fs.writeFile(filePath, content, "utf-8");
+			if (filename === "metadata.yaml") {
+				// Write metadata to the correct location
+				await fs.writeFile(METADATA_FILE, content, "utf-8");
+			} else {
+				// Write tool files to shortcuts directory
+				const filePath = path.join(SHORTCUTS_DIR, filename);
+				await fs.writeFile(filePath, content, "utf-8");
+			}
 		}
 
 		return NextResponse.json({

@@ -5,21 +5,24 @@ import type { Shortcut } from "~/types/shortcuts";
 // PUT /api/shortcuts/[tool]/[shortcutId] - Update a specific shortcut
 export async function PUT(
 	request: Request,
-	{ params }: { params: { tool: string; shortcutId: string } },
+	{ params }: { params: Promise<{ tool: string; shortcutId: string }> },
 ) {
 	try {
 		const body = await request.json();
 		const updatedShortcut = body as Shortcut;
+		
+		// Await params
+		const { tool, shortcutId } = await params;
 
 		// Load the tool
-		const toolFile = await loadTool(params.tool);
+		const toolFile = await loadTool(tool);
 		if (!toolFile) {
 			return NextResponse.json({ error: "Tool not found" }, { status: 404 });
 		}
 
 		// Update the shortcut
 		const shortcutIndex = toolFile.shortcuts.findIndex(
-			(s) => s.id === params.shortcutId,
+			(s) => s.id === shortcutId,
 		);
 
 		if (shortcutIndex === -1) {
@@ -32,7 +35,7 @@ export async function PUT(
 		toolFile.shortcuts[shortcutIndex] = updatedShortcut;
 
 		// Save the tool
-		await saveTool(params.tool, toolFile);
+		await saveTool(tool, toolFile);
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
@@ -47,22 +50,25 @@ export async function PUT(
 // DELETE /api/shortcuts/[tool]/[shortcutId] - Delete a specific shortcut
 export async function DELETE(
 	request: Request,
-	{ params }: { params: { tool: string; shortcutId: string } },
+	{ params }: { params: Promise<{ tool: string; shortcutId: string }> },
 ) {
 	try {
+		// Await params
+		const { tool, shortcutId } = await params;
+		
 		// Load the tool
-		const toolFile = await loadTool(params.tool);
+		const toolFile = await loadTool(tool);
 		if (!toolFile) {
 			return NextResponse.json({ error: "Tool not found" }, { status: 404 });
 		}
 
 		// Remove the shortcut
 		toolFile.shortcuts = toolFile.shortcuts.filter(
-			(s) => s.id !== params.shortcutId,
+			(s) => s.id !== shortcutId,
 		);
 
 		// Save the tool
-		await saveTool(params.tool, toolFile);
+		await saveTool(tool, toolFile);
 
 		return NextResponse.json({ success: true });
 	} catch (error) {

@@ -1,22 +1,30 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
-
-const DATA_DIR = path.join(process.cwd(), "data", "shortcuts");
+import { SHORTCUTS_DIR, METADATA_FILE } from "~/lib/paths";
 
 export async function GET() {
 	try {
-		// Read all YAML files from the data directory
-		const files = await fs.readdir(DATA_DIR);
+		// Read all YAML files from the shortcuts directory
+		const files = await fs.readdir(SHORTCUTS_DIR);
 		const yamlFiles = files.filter((file) => file.endsWith(".yaml"));
 
 		// Read content of all YAML files
 		const exportData: Record<string, string> = {};
 
 		for (const file of yamlFiles) {
-			const filePath = path.join(DATA_DIR, file);
+			const filePath = path.join(SHORTCUTS_DIR, file);
 			const content = await fs.readFile(filePath, "utf-8");
 			exportData[file] = content;
+		}
+
+		// Also include metadata file
+		try {
+			const metadataContent = await fs.readFile(METADATA_FILE, "utf-8");
+			exportData["metadata.yaml"] = metadataContent;
+		} catch (error) {
+			// Metadata file might not exist
+			console.warn("Metadata file not found:", error);
 		}
 
 		// Create timestamp for filename

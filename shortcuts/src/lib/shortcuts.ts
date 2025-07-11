@@ -2,16 +2,13 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import yaml from "js-yaml";
 import type { Metadata, Shortcut, ToolFile } from "~/types/shortcuts";
-import { parseToolFile } from "./yaml-parser";
-
-const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), "data");
-const TOOLS_DIR = path.join(DATA_DIR, "tools");
-const METADATA_FILE = path.join(DATA_DIR, "metadata.yaml");
+import { parseToolFile, type RawToolFile } from "./yaml-parser";
+import { SHORTCUTS_DIR, METADATA_FILE, getToolFilePath } from "./paths";
 
 // Ensure data directories exist
 async function ensureDataDirs() {
 	try {
-		await fs.mkdir(TOOLS_DIR, { recursive: true });
+		await fs.mkdir(SHORTCUTS_DIR, { recursive: true });
 	} catch (error) {
 		console.error("Failed to create data directories:", error);
 	}
@@ -22,15 +19,15 @@ export async function loadAllTools(): Promise<ToolFile[]> {
 	await ensureDataDirs();
 
 	try {
-		const files = await fs.readdir(TOOLS_DIR);
+		const files = await fs.readdir(SHORTCUTS_DIR);
 		const yamlFiles = files.filter(
 			(f) => f.endsWith(".yaml") || f.endsWith(".yml"),
 		);
 
 		const tools = await Promise.all(
 			yamlFiles.map(async (file) => {
-				const content = await fs.readFile(path.join(TOOLS_DIR, file), "utf-8");
-				const data = yaml.load(content) as Record<string, unknown>;
+				const content = await fs.readFile(path.join(SHORTCUTS_DIR, file), "utf-8");
+				const data = yaml.load(content) as unknown as RawToolFile;
 				return parseToolFile(data);
 			}),
 		);
@@ -45,9 +42,9 @@ export async function loadAllTools(): Promise<ToolFile[]> {
 // Load a specific tool
 export async function loadTool(toolName: string): Promise<ToolFile | null> {
 	try {
-		const filePath = path.join(TOOLS_DIR, `${toolName}.yaml`);
+		const filePath = getToolFilePath(toolName);
 		const content = await fs.readFile(filePath, "utf-8");
-		const data = yaml.load(content) as Record<string, unknown>;
+		const data = yaml.load(content) as unknown as RawToolFile;
 		return parseToolFile(data);
 	} catch (error) {
 		console.error(`Failed to load tool ${toolName}:`, error);
@@ -77,14 +74,14 @@ export async function saveTool(
 ): Promise<void> {
 	await ensureDataDirs();
 
-	const filePath = path.join(TOOLS_DIR, `${toolName}.yaml`);
+	const filePath = getToolFilePath(toolName);
 	const content = yaml.dump(toolFile);
 	await fs.writeFile(filePath, content, "utf-8");
 }
 
 // Delete a tool
 export async function deleteTool(toolName: string): Promise<void> {
-	const filePath = path.join(TOOLS_DIR, `${toolName}.yaml`);
+	const filePath = getToolFilePath(toolName);
 	await fs.unlink(filePath);
 }
 

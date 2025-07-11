@@ -3,22 +3,22 @@ import path from "node:path";
 import * as yaml from "js-yaml";
 import { NextResponse } from "next/server";
 import type { ToolFile } from "~/types/shortcuts";
-
-const DATA_DIR = path.join(process.cwd(), "data", "shortcuts");
+import { getToolFilePath, SHORTCUTS_DIR } from "~/lib/paths";
 
 // Update or create a tool file
 export async function PUT(
 	_request: Request,
-	{ params }: { params: { tool: string } },
+	{ params }: { params: Promise<{ tool: string }> },
 ) {
 	try {
 		const body = await _request.json();
 		const { tool, shortcuts } = body as ToolFile;
+		const { tool: toolName } = await params;
 
-		// Ensure data directory exists
-		await fs.mkdir(DATA_DIR, { recursive: true });
+		// Ensure shortcuts directory exists
+		await fs.mkdir(SHORTCUTS_DIR, { recursive: true });
 
-		const filePath = path.join(DATA_DIR, `${params.tool}.yaml`);
+		const filePath = getToolFilePath(toolName);
 
 		// Create the YAML content
 		const yamlContent = yaml.dump(

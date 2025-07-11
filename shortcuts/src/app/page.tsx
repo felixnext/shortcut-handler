@@ -395,7 +395,11 @@ export default function HomePage() {
 				isOpen={dialogOpen}
 				onClose={() => setDialogOpen(false)}
 				onSave={handleSave}
-				onDelete={dialogMode === "edit" ? handleDelete : undefined}
+				onDelete={
+					dialogMode === "edit" && editingShortcut
+						? (shortcut: Shortcut, toolName: string) => handleDelete(editingShortcut)
+						: undefined
+				}
 				onCreateTool={handleCreateTool}
 				onCreateCategory={handleCreateCategory}
 				shortcut={editingShortcut?.shortcut}

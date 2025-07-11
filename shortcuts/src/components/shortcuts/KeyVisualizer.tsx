@@ -18,7 +18,7 @@ export function KeyVisualizer({
 }: KeyVisualizerProps) {
 	const visualizationType = getVisualizationType(keys);
 
-	if (visualizationType === "command" && keys[0]?.length === 1) {
+	if (visualizationType === "command" && keys[0]?.length === 1 && keys[0][0]) {
 		return (
 			<CommandDisplay command={keys[0][0]} size={size} className={className} />
 		);

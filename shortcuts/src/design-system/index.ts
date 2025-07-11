@@ -14,12 +14,12 @@ export function applyTheme(theme: Theme): void {
 	};
 
 	// Recursively set color variables
-	const applyColors = (obj: Record<string, unknown>, path: string[] = []) => {
+	const applyColors = (obj: any, path: string[] = []) => {
 		for (const [key, value] of Object.entries(obj)) {
 			if (typeof value === "string") {
 				setColorVar([...path, key], value);
 			} else if (typeof value === "object" && value !== null) {
-				applyColors(value as Record<string, unknown>, [...path, key]);
+				applyColors(value, [...path, key]);
 			}
 		}
 	};

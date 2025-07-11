@@ -14,14 +14,14 @@ export function parseShortcutKeys(keys: string[] | Key[][]): Key[][] {
 }
 
 // Parse tool file and convert keys to proper format
-interface RawToolFile {
+export interface RawToolFile {
 	tool: Record<string, unknown>;
 	shortcuts: Record<string, unknown>[];
 }
 
 export function parseToolFile(data: RawToolFile): ToolFile {
-	const tool = data.tool;
-	const shortcuts: Shortcut[] = data.shortcuts.map((shortcut) => ({
+	const tool = data.tool as any;
+	const shortcuts: Shortcut[] = data.shortcuts.map((shortcut: any) => ({
 		...shortcut,
 		keys: {
 			default: parseShortcutKeys(shortcut.keys.default),
@@ -41,7 +41,7 @@ export function parseToolFile(data: RawToolFile): ToolFile {
 // For writing back to YAML, convert Key[][] to string[] for readability
 export function stringifyKeys(keys: Key[][]): string[] {
 	return keys.map((combo) => {
-		if (combo.length === 1 && combo[0].type === "command") {
+		if (combo.length === 1 && combo[0]?.type === "command") {
 			return combo[0].key;
 		}
 		// Generate multiple variations for better search matching

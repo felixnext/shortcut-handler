@@ -37,7 +37,7 @@ pnpm install
 
 3. Create the data directory structure:
 ```bash
-mkdir -p data/tools
+mkdir -p data/shortcuts
 ```
 
 4. Run the development server:
@@ -49,14 +49,20 @@ pnpm dev
 
 ### Docker Deployment
 
-1. Build and run with Docker Compose:
+1. Create your local shortcuts directory:
 ```bash
+mkdir -p ~/.config/shortcuts/shortcuts
+```
+
+2. Build and run with Docker Compose:
+```bash
+cd shortcuts
 docker-compose up -d
 ```
 
-2. Access the application at [http://localhost:3000](http://localhost:3000)
+3. Access the application at [http://localhost:3000](http://localhost:3000)
 
-3. Shortcut data will be persisted in the `./shortcuts-data` directory
+4. Shortcut data will be persisted in `~/.config/shortcuts`
 
 ### Manual Docker Build
 
@@ -66,7 +72,7 @@ cd shortcuts
 docker build -t keyboard-shortcuts .
 
 # Run the container
-docker run -p 3000:3000 -v $(pwd)/shortcuts-data:/app/data keyboard-shortcuts
+docker run -p 3000:3000 -v $HOME/.config/shortcuts:/app/data -e DATA_DIR=/app/data keyboard-shortcuts
 ```
 
 ## Usage
@@ -102,9 +108,9 @@ docker run -p 3000:3000 -v $(pwd)/shortcuts-data:/app/data keyboard-shortcuts
 
 ### Data Format
 
-Shortcuts are stored in YAML format for easy editing. Each tool has its own file in the `data/tools/` directory.
+Shortcuts are stored in YAML format for easy editing. Each tool has its own file in the `data/shortcuts/` directory.
 
-Example (`data/tools/vim.yaml`):
+Example (`data/shortcuts/vim.yaml`):
 ```yaml
 tool:
   name: Vim
@@ -122,6 +128,23 @@ shortcuts:
 ```
 
 ## Development
+
+### Data Storage
+
+- Tool shortcuts are stored in YAML files in `~/.config/shortcuts/shortcuts/`
+- Each tool has its own YAML file (e.g., `vscode.yaml`, `vim.yaml`)
+- The `metadata.yaml` file is stored in `~/.config/shortcuts/metadata.yaml`
+- Directory structure:
+  ```
+  ~/.config/shortcuts/
+  ├── metadata.yaml          # Category definitions
+  └── shortcuts/            # Tool YAML files
+      ├── vscode.yaml
+      ├── vim.yaml
+      └── ...
+  ```
+
+Docker mounts the entire `~/.config/shortcuts` directory to `/app/data` in the container using the `$HOME` environment variable.
 
 ### Commands
 
@@ -152,8 +175,8 @@ shortcuts/
 │   ├── components/   # React components
 │   ├── lib/          # Utility functions
 │   └── types/        # TypeScript types
-├── data/             # Shortcut data (git-ignored)
-│   ├── tools/        # Tool-specific YAML files
+├── data/             # Shortcut data (git-ignored, for local dev only)
+│   ├── shortcuts/    # Tool-specific YAML files
 │   └── metadata.yaml # Categories and shared data
 └── public/           # Static assets
 ```

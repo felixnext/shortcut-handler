@@ -9,7 +9,8 @@ services:
     ports:
       - "8042:3000"
     volumes:
-      - ./shortcuts-data:/app/data
+      - ${HOME}/.config/shortcuts:/app/data
     environment:
+      - DATA_DIR=/app/data
       - NODE_ENV=production
     restart: unless-stopped

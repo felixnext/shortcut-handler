@@ -12,7 +12,7 @@ export function getVisualizationType(keys: Key[][]): KeyVisualizationType {
 
 	// Single key combination - check if it's a command
 	const firstCombo = keys[0];
-	if (firstCombo.length === 1 && firstCombo[0].type === "command") {
+	if (firstCombo && firstCombo.length === 1 && firstCombo[0]?.type === "command") {
 		return "command";
 	}
 

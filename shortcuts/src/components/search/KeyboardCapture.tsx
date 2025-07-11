@@ -20,7 +20,7 @@ export function KeyboardCapture({
 }: KeyboardCaptureProps) {
 	const [isCapturing, setIsCapturing] = useState(false);
 	const [capturedKeys, setCapturedKeys] = useState<string[]>([]);
-	const timeoutRef = useRef<NodeJS.Timeout>();
+	const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
 	// Convert key event to display string
 	const keyEventToString = useCallback((e: KeyboardEvent): string | null => {
