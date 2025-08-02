@@ -56,8 +56,58 @@
 	}
 }
 
+/* Custom animations */
+@keyframes gradient-x {
+	0%, 100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+@keyframes gradient-xy {
+	0%, 100% {
+		background-position: 0% 0%;
+	}
+	25% {
+		background-position: 100% 0%;
+	}
+	50% {
+		background-position: 100% 100%;
+	}
+	75% {
+		background-position: 0% 100%;
+	}
+}
+
+@keyframes pulse-glow {
+	0%, 100% {
+		opacity: 0.3;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.6;
+		transform: scale(1.05);
+	}
+}
+
 /* Custom utility classes */
 @layer utilities {
+	/* Animation utilities */
+	.animate-gradient-x {
+		animation: gradient-x 3s ease infinite;
+	}
+	
+	.animate-gradient-xy {
+		animation: gradient-xy 4s ease infinite;
+		background-size: 200% 200%;
+	}
+	
+	.animate-pulse-glow {
+		animation: pulse-glow 2s ease-in-out infinite;
+	}
+
 	/* Spacing utilities that map to our design tokens */
 	.p-card {
 		padding: 1rem; /* spacing.4 */

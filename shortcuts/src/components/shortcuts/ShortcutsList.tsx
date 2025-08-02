@@ -11,10 +11,12 @@ import { ShortcutCard } from "./ShortcutCard";
 interface ShortcutsListProps {
 	shortcuts: SearchableShortcut[];
 	categories: Category[];
+	learningIds: Set<string>;
 	onToolClick?: (tool: string) => void;
 	onCategoryClick?: (category: string) => void;
 	onEdit?: (shortcut: SearchableShortcut) => void;
 	onDelete?: (shortcut: SearchableShortcut) => void;
+	onToggleLearning?: (shortcutId: string) => void;
 }
 
 type ViewMode = "grid" | "swimlanes";
@@ -22,10 +24,12 @@ type ViewMode = "grid" | "swimlanes";
 export function ShortcutsList({
 	shortcuts,
 	categories,
+	learningIds,
 	onToolClick,
 	onCategoryClick,
 	onEdit,
 	onDelete,
+	onToggleLearning,
 }: ShortcutsListProps) {
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
@@ -124,10 +128,12 @@ export function ShortcutsList({
 						shortcut={item.shortcut}
 						tool={item.toolInfo}
 						category={getCategoryName(item.shortcut.category)}
+						isLearning={learningIds.has(item.shortcut.id)}
 						onToolClick={onToolClick}
 						onCategoryClick={onCategoryClick}
 						onEdit={() => onEdit?.(item)}
 						onDelete={() => onDelete?.(item)}
+						onToggleLearning={() => onToggleLearning?.(item.shortcut.id)}
 					/>
 				</div>
 			))}
@@ -168,10 +174,12 @@ export function ShortcutsList({
 											shortcut={item.shortcut}
 											tool={item.toolInfo}
 											category={category.name}
+											isLearning={learningIds.has(item.shortcut.id)}
 											onToolClick={onToolClick}
 											onCategoryClick={onCategoryClick}
 											onEdit={() => onEdit?.(item)}
 											onDelete={() => onDelete?.(item)}
+											onToggleLearning={() => onToggleLearning?.(item.shortcut.id)}
 										/>
 									</div>
 								))}
@@ -197,10 +205,12 @@ export function ShortcutsList({
 									<ShortcutCard
 										shortcut={item.shortcut}
 										tool={item.toolInfo}
+										isLearning={learningIds.has(item.shortcut.id)}
 										onToolClick={onToolClick}
 										onCategoryClick={onCategoryClick}
 										onEdit={() => onEdit?.(item)}
 										onDelete={() => onDelete?.(item)}
+										onToggleLearning={() => onToggleLearning?.(item.shortcut.id)}
 									/>
 								</div>
 							))}

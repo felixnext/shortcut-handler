@@ -1,4 +1,4 @@
-import { Edit, Hash, Wrench as ToolIcon, Trash2 } from "lucide-react";
+import { Bookmark, Edit, Hash, Wrench as ToolIcon, Trash2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { getShortcutKeys } from "~/lib/shortcut-utils";
@@ -10,8 +10,10 @@ interface ShortcutCardProps {
 	shortcut: Shortcut;
 	tool: Tool;
 	category?: string;
+	isLearning?: boolean;
 	onEdit?: () => void;
 	onDelete?: () => void;
+	onToggleLearning?: () => void;
 	onToolClick?: (tool: string) => void;
 	onCategoryClick?: (category: string) => void;
 	className?: string;
@@ -21,8 +23,10 @@ export function ShortcutCard({
 	shortcut,
 	tool,
 	category,
+	isLearning,
 	onEdit,
 	onDelete,
+	onToggleLearning,
 	onToolClick,
 	onCategoryClick,
 	className,
@@ -44,10 +48,20 @@ export function ShortcutCard({
 
 	return (
 		<>
-			<div
-				ref={cardRef}
-				className={cn(
-					"group relative",
+			<div className={cn("relative", isLearning && "magical-learning-card")}>
+				{/* Magical glowing border for learning items */}
+				{isLearning && (
+					<>
+						{/* Animated gradient background */}
+						<div className="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-violet-600 via-pink-600 to-cyan-600 opacity-75 blur animate-gradient-xy" />
+						{/* Pulsing glow effect */}
+						<div className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-violet-600 via-pink-600 to-cyan-600 opacity-30 blur-md animate-pulse-glow" />
+					</>
+				)}
+				<div
+					ref={cardRef}
+					className={cn(
+						"group relative",
 					"p-5", // Increased padding for breathing room
 					"rounded-xl", // More modern rounded corners
 					"transition-all duration-300 ease-out", // Smoother transitions
@@ -75,8 +89,33 @@ export function ShortcutCard({
 					</h3>
 
 					{/* Actions - always visible on mobile, hover on desktop */}
-					{(onEdit || onDelete) && (
+					{(onEdit || onDelete || onToggleLearning) && (
 						<div className="flex shrink-0 items-center gap-1 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+							{onToggleLearning && (
+								<button
+									type="button"
+									onClick={onToggleLearning}
+									className={cn(
+										"rounded-md p-1.5",
+										"transition-colors",
+										isLearning ? [
+											"text-violet-600 dark:text-violet-400",
+											"hover:text-violet-700 dark:hover:text-violet-300",
+											"hover:bg-violet-500/10",
+										] : [
+											"text-[var(--color-foreground-tertiary)]",
+											"hover:text-violet-600 dark:hover:text-violet-400",
+											"hover:bg-[var(--color-state-hover)]",
+										],
+									)}
+									title={isLearning ? "Remove from learning" : "Mark as learning"}
+								>
+									<Bookmark className={cn(
+										"h-3.5 w-3.5",
+										isLearning && "fill-current"
+									)} />
+								</button>
+							)}
 							{onEdit && (
 								<button
 									type="button"
@@ -191,6 +230,7 @@ export function ShortcutCard({
 				/>
 			</div>
 
+			</div>
 			</div>
 
 			{/* Fixed positioned tooltip with portal */}

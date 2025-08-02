@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X } from "lucide-react";
+import { Bookmark, Check, X } from "lucide-react";
 import { cn } from "~/lib/utils";
 import type { Category } from "~/types/shortcuts";
 
@@ -9,8 +9,11 @@ interface FilterSidebarProps {
 	categories: Array<{ category: Category; count: number }>;
 	selectedTools: string[];
 	selectedCategories: string[];
+	learningCount: number;
+	isLearningFilterActive: boolean;
 	onToolToggle: (tool: string) => void;
 	onCategoryToggle: (category: string) => void;
+	onLearningToggle: () => void;
 	onClearAll?: () => void;
 	className?: string;
 }
@@ -20,14 +23,17 @@ export function FilterSidebar({
 	categories,
 	selectedTools,
 	selectedCategories,
+	learningCount,
+	isLearningFilterActive,
 	onToolToggle,
 	onCategoryToggle,
+	onLearningToggle,
 	onClearAll,
 	className,
 }: FilterSidebarProps) {
 	const hasActiveFilters =
-		selectedTools.length > 0 || selectedCategories.length > 0;
-	const activeFilterCount = selectedTools.length + selectedCategories.length;
+		selectedTools.length > 0 || selectedCategories.length > 0 || isLearningFilterActive;
+	const activeFilterCount = selectedTools.length + selectedCategories.length + (isLearningFilterActive ? 1 : 0);
 
 	return (
 		<aside className={cn("space-y-6", className)}>
@@ -56,6 +62,58 @@ export function FilterSidebar({
 					)}
 				</div>
 			)}
+
+			{/* Learning Filter */}
+			<div>
+				<h3 className="mb-3 font-semibold text-[var(--color-foreground-primary)] text-sm">
+					Learning
+				</h3>
+				<button
+					type="button"
+					onClick={onLearningToggle}
+					className={cn(
+						"flex w-full items-center justify-between",
+						"rounded-md px-3 py-2",
+						"font-medium text-sm",
+						"transition-all duration-150",
+						"group",
+						isLearningFilterActive
+							? [
+									"bg-gradient-to-r from-violet-500/20 to-pink-500/20",
+									"text-violet-700 dark:text-violet-300",
+									"border border-violet-500/30",
+									"shadow-sm",
+								]
+							: [
+									"bg-[var(--color-sidebar-itemBackground)]",
+									"text-[var(--color-sidebar-itemForeground)]",
+									"hover:bg-[var(--color-sidebar-itemBackgroundHover)]",
+									"border border-transparent",
+								],
+					)}
+				>
+					<span className="flex items-center gap-2">
+						<Bookmark 
+							className={cn(
+								"h-3.5 w-3.5",
+								isLearningFilterActive && "fill-current"
+							)} 
+						/>
+						<span>Currently Learning</span>
+					</span>
+					<span
+						className={cn(
+							"text-xs",
+							"rounded px-1.5 py-0.5",
+							isLearningFilterActive
+								? "bg-violet-500/30"
+								: "bg-[var(--color-background-tertiary)]",
+						)}
+					>
+						{learningCount}
+					</span>
+				</button>
+			</div>
 
 			{/* Tools Filter */}
 			<div>

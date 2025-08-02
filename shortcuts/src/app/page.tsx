@@ -8,6 +8,7 @@ import { KeyboardCapture } from "~/components/search/KeyboardCapture";
 import { SearchBar } from "~/components/search/SearchBar";
 import { ShortcutDialog } from "~/components/shortcuts/ShortcutDialog";
 import { ShortcutsList } from "~/components/shortcuts/ShortcutsList";
+import { useLearningShortcuts } from "~/hooks/useLearningShortcuts";
 import {
 	type SearchableShortcut,
 	createSearchIndex,
@@ -34,8 +35,10 @@ export default function HomePage() {
 		capturedKeys: "",
 		tools: [],
 		categories: [],
+		learning: false,
 	});
 	const [loading, setLoading] = useState(true);
+	const { learningIds, toggleLearning, isLearning, learningCount } = useLearningShortcuts();
 
 	// Dialog state
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -82,9 +85,16 @@ export default function HomePage() {
 			: null;
 
 	// Filter shortcuts
-	const filteredShortcuts = searchIndex
+	let filteredShortcuts = searchIndex
 		? filterShortcuts(shortcuts, filters, searchIndex)
 		: shortcuts;
+	
+	// Apply learning filter
+	if (filters.learning) {
+		filteredShortcuts = filteredShortcuts.filter(shortcut => 
+			learningIds.has(shortcut.shortcut.id)
+		);
+	}
 
 	// Calculate counts for filters
 	const toolCounts = new Map<string, number>();
@@ -133,12 +143,20 @@ export default function HomePage() {
 		}));
 	};
 
+	const handleLearningToggle = () => {
+		setFilters((prev) => ({
+			...prev,
+			learning: !prev.learning,
+		}));
+	};
+
 	const handleClearFilters = () => {
 		setFilters({
 			query: "",
 			capturedKeys: "",
 			tools: [],
 			categories: [],
+			learning: false,
 		});
 	};
 
@@ -367,8 +385,11 @@ export default function HomePage() {
 						categories={categoriesWithCounts}
 						selectedTools={filters.tools || []}
 						selectedCategories={filters.categories || []}
+						learningCount={learningCount}
+						isLearningFilterActive={filters.learning || false}
 						onToolToggle={handleToolToggle}
 						onCategoryToggle={handleCategoryToggle}
+						onLearningToggle={handleLearningToggle}
 						onClearAll={handleClearFilters}
 						className={cn(
 							"hidden w-64 shrink-0 lg:block",
@@ -381,10 +402,12 @@ export default function HomePage() {
 						<ShortcutsList
 							shortcuts={filteredShortcuts}
 							categories={metadata.categories}
+							learningIds={learningIds}
 							onToolClick={handleToolClick}
 							onCategoryClick={handleCategoryClick}
 							onEdit={handleEdit}
 							onDelete={handleDelete}
+							onToggleLearning={toggleLearning}
 						/>
 					</main>
 				</div>

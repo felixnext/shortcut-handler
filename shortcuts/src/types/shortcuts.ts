@@ -55,4 +55,5 @@ export interface SearchFilters {
 	tools?: string[];
 	categories?: string[];
 	searchType?: SearchType;
+	learning?: boolean; // Filter to show only learning shortcuts
 }
