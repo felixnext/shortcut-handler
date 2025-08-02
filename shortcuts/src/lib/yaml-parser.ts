@@ -44,6 +44,10 @@ export function stringifyKeys(keys: Key[][]): string[] {
 		if (combo.length === 1 && combo[0]?.type === "command") {
 			return combo[0].key;
 		}
+		// Special case: if it's a single key and it's a special character, return it as-is
+		if (combo.length === 1 && combo[0]) {
+			return combo[0].key;
+		}
 		// Generate multiple variations for better search matching
 		const parts = combo.map((k) => {
 			// Normalize key names for search

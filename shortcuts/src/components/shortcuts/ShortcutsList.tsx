@@ -117,18 +117,19 @@ export function ShortcutsList({
 
 	// Grid view
 	const GridView = () => (
-		<div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+		<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{shortcuts.map((item) => (
-				<ShortcutCard
-					key={`${item.tool}-${item.shortcut.id}`}
-					shortcut={item.shortcut}
-					tool={item.toolInfo}
-					category={getCategoryName(item.shortcut.category)}
-					onToolClick={onToolClick}
-					onCategoryClick={onCategoryClick}
-					onEdit={() => onEdit?.(item)}
-					onDelete={() => onDelete?.(item)}
-				/>
+				<div key={`${item.tool}-${item.shortcut.id}`}>
+					<ShortcutCard
+						shortcut={item.shortcut}
+						tool={item.toolInfo}
+						category={getCategoryName(item.shortcut.category)}
+						onToolClick={onToolClick}
+						onCategoryClick={onCategoryClick}
+						onEdit={() => onEdit?.(item)}
+						onDelete={() => onDelete?.(item)}
+					/>
+				</div>
 			))}
 		</div>
 	);
@@ -160,18 +161,19 @@ export function ShortcutsList({
 							</div>
 
 							{/* Grid of cards for this category */}
-							<div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+							<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 								{categoryShortcuts.map((item) => (
-									<ShortcutCard
-										key={`${item.tool}-${item.shortcut.id}`}
-										shortcut={item.shortcut}
-										tool={item.toolInfo}
-										category={category.name}
-										onToolClick={onToolClick}
-										onCategoryClick={onCategoryClick}
-										onEdit={() => onEdit?.(item)}
-										onDelete={() => onDelete?.(item)}
-									/>
+									<div key={`${item.tool}-${item.shortcut.id}`}>
+										<ShortcutCard
+											shortcut={item.shortcut}
+											tool={item.toolInfo}
+											category={category.name}
+											onToolClick={onToolClick}
+											onCategoryClick={onCategoryClick}
+											onEdit={() => onEdit?.(item)}
+											onDelete={() => onDelete?.(item)}
+										/>
+									</div>
 								))}
 							</div>
 						</div>
@@ -189,17 +191,18 @@ export function ShortcutsList({
 								({(grouped.get("") || []).length})
 							</span>
 						</div>
-						<div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 							{(grouped.get("") || []).map((item) => (
-								<ShortcutCard
-									key={`${item.tool}-${item.shortcut.id}`}
-									shortcut={item.shortcut}
-									tool={item.toolInfo}
-									onToolClick={onToolClick}
-									onCategoryClick={onCategoryClick}
-									onEdit={() => onEdit?.(item)}
-									onDelete={() => onDelete?.(item)}
-								/>
+								<div key={`${item.tool}-${item.shortcut.id}`}>
+									<ShortcutCard
+										shortcut={item.shortcut}
+										tool={item.toolInfo}
+										onToolClick={onToolClick}
+										onCategoryClick={onCategoryClick}
+										onEdit={() => onEdit?.(item)}
+										onDelete={() => onDelete?.(item)}
+									/>
+								</div>
 							))}
 						</div>
 					</div>

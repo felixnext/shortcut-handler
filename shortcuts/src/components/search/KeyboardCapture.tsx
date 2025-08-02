@@ -37,13 +37,15 @@ export function KeyboardCapture({
 			e.key &&
 			!["Control", "Alt", "Shift", "Meta", "Enter"].includes(e.key)
 		) {
-			// Normalize key names
+			// Normalize key names and handle special characters with escape sequences
 			let key = e.key;
-			if (key === " ") key = "space";
-			else if (key === "ArrowUp") key = "up";
-			else if (key === "ArrowDown") key = "down";
-			else if (key === "ArrowLeft") key = "left";
-			else if (key === "ArrowRight") key = "right";
+			if (key === " ") key = "\\space";
+			else if (key === "ArrowUp") key = "\\up";
+			else if (key === "ArrowDown") key = "\\down";
+			else if (key === "ArrowLeft") key = "\\left";
+			else if (key === "ArrowRight") key = "\\right";
+			else if (key === "+") key = "\\plus";
+			else if (key === "-") key = "\\minus";
 			else if (key.length === 1) key = key.toLowerCase();
 
 			parts.push(key);

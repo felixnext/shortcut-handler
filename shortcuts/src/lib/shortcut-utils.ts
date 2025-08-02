@@ -115,8 +115,24 @@ export function parseKeyString(keyStr: string): Key[] {
 		return [{ key: keyStr, type: "command" }];
 	}
 
-	// Key combination pattern
-	const parts = keyStr.split("+").map((p) => p.trim());
+	// Handle escape sequences - just return the escaped string as-is for KeyPress to handle
+	if (keyStr.includes("\\")) {
+		return [{
+			key: keyStr,
+			isModifier: false,
+			type: "key" as const,
+		}];
+	}
+
+	// Check if the entire string is just a single special character
+	if (keyStr === "+" || keyStr === "," || keyStr === " ") {
+		return [{
+			key: keyStr,
+			isModifier: false,
+			type: "key" as const,
+		}];
+	}
+
 	const modifierNames = [
 		"ctrl",
 		"cmd",
@@ -126,14 +142,51 @@ export function parseKeyString(keyStr: string): Key[] {
 		"meta",
 		"win",
 		"super",
+		"control",
+		"command",
+		"option",
 	];
 
-	return parts.map((part) => {
-		const isModifier = modifierNames.includes(part.toLowerCase());
-		return {
-			key: part,
-			isModifier,
-			type: "key" as const,
-		};
-	});
+	// First try to split by + for modifier combinations
+	// But only if the string contains actual modifiers
+	const hasModifier = modifierNames.some(mod => 
+		keyStr.toLowerCase().includes(mod)
+	);
+
+	if (hasModifier && keyStr.includes("+")) {
+		// Split by + and check each part
+		const parts = keyStr.split("+").map(p => p.trim()).filter(p => p);
+		
+		// Validate that we have valid parts
+		if (parts.length > 1) {
+			return parts.map((part) => {
+				const isModifier = modifierNames.includes(part.toLowerCase());
+				return {
+					key: part,
+					isModifier,
+					type: "key" as const,
+				};
+			});
+		}
+	}
+
+	// For strings without modifiers, check if it's space-separated
+	// This handles cases like "g d" or "[ d"
+	if (keyStr.includes(" ") && !hasModifier) {
+		const parts = keyStr.split(" ").filter(p => p);
+		if (parts.length > 1) {
+			return parts.map((part) => ({
+				key: part,
+				isModifier: false,
+				type: "key" as const,
+			}));
+		}
+	}
+
+	// Default case: return the whole string as a single key
+	return [{
+		key: keyStr,
+		isModifier: modifierNames.includes(keyStr.toLowerCase()),
+		type: "key" as const,
+	}];
 }

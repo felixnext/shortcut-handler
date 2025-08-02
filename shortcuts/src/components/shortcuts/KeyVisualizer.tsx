@@ -30,11 +30,29 @@ export function KeyVisualizer({
 
 	// Single key combination
 	if (keys[0]) {
+		// Much more aggressive scaling based on key count
+		const keyCount = keys[0].length;
+		let scaleMultiplier = 1;
+		let keySize = size;
+		
+		// Progressive scaling - start earlier and scale more aggressively
+		if (keyCount > 2) {
+			scaleMultiplier = Math.max(0.4, 1 - (keyCount - 2) * 0.2);
+			// Also reduce key size for very long sequences
+			if (keyCount > 4 && size === "md") keySize = "sm";
+		}
+		
 		return (
-			<div className={cn("inline-flex items-center gap-1", className)}>
-				{keys[0].map((key, index) => (
-					<KeyPress key={`key-${index}-${key.key}`} keyData={key} size={size} />
-				))}
+			<div className={cn("inline-flex items-center gap-1 overflow-hidden w-full", className)}>
+				<div className="inline-flex items-center gap-0.5 min-w-0" style={{
+					transform: `scale(${scaleMultiplier})`,
+					transformOrigin: 'left center',
+					width: 'max-content'
+				}}>
+					{keys[0].map((key, index) => (
+						<KeyPress key={`key-${index}-${key.key}`} keyData={key} size={keySize} />
+					))}
+				</div>
 			</div>
 		);
 	}
