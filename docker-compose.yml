@@ -13,4 +13,4 @@ services:
     environment:
       - DATA_DIR=/app/data
       - NODE_ENV=production
-    restart: unless-stopped
+    restart: always
