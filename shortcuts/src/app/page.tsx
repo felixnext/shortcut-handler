@@ -8,7 +8,6 @@ import { KeyboardCapture } from "~/components/search/KeyboardCapture";
 import { SearchBar } from "~/components/search/SearchBar";
 import { ShortcutDialog } from "~/components/shortcuts/ShortcutDialog";
 import { ShortcutsList } from "~/components/shortcuts/ShortcutsList";
-import { useLearningShortcuts } from "~/hooks/useLearningShortcuts";
 import {
 	type SearchableShortcut,
 	createSearchIndex,
@@ -38,7 +37,6 @@ export default function HomePage() {
 		learning: false,
 	});
 	const [loading, setLoading] = useState(true);
-	const { learningIds, toggleLearning, isLearning, learningCount } = useLearningShortcuts();
 
 	// Dialog state
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -92,13 +90,14 @@ export default function HomePage() {
 	// Apply learning filter
 	if (filters.learning) {
 		filteredShortcuts = filteredShortcuts.filter(shortcut => 
-			learningIds.has(shortcut.shortcut.id)
+			shortcut.shortcut.learning === true
 		);
 	}
 
 	// Calculate counts for filters
 	const toolCounts = new Map<string, number>();
 	const categoryCounts = new Map<string, number>();
+	let learningCount = 0;
 
 	for (const shortcut of shortcuts) {
 		// Tool counts
@@ -108,6 +107,11 @@ export default function HomePage() {
 		// Category counts
 		const catCount = categoryCounts.get(shortcut.shortcut.category) || 0;
 		categoryCounts.set(shortcut.shortcut.category, catCount + 1);
+		
+		// Learning count
+		if (shortcut.shortcut.learning) {
+			learningCount++;
+		}
 	}
 
 	const toolsWithCounts = Array.from(toolCounts.entries()).map(
@@ -302,6 +306,50 @@ export default function HomePage() {
 		}
 	};
 
+	const handleToggleLearning = async (shortcutId: string) => {
+		console.log("Toggle learning for:", shortcutId);
+		// Find the shortcut
+		const shortcut = shortcuts.find(s => s.shortcut.id === shortcutId);
+		if (!shortcut) {
+			console.error("Shortcut not found:", shortcutId);
+			return;
+		}
+
+		const newLearningStatus = !shortcut.shortcut.learning;
+		console.log("New learning status:", newLearningStatus, "for tool:", shortcut.tool);
+
+		try {
+			// Update on server
+			const response = await fetch(
+				`/api/shortcuts/${shortcut.tool}/${shortcutId}/learning`,
+				{
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ learning: newLearningStatus }),
+				}
+			);
+
+			if (response.ok) {
+				// Update local state
+				setShortcuts((prev) =>
+					prev.map((s) =>
+						s.shortcut.id === shortcutId
+							? {
+									...s,
+									shortcut: { ...s.shortcut, learning: newLearningStatus },
+								}
+							: s
+					)
+				);
+			} else {
+				const errorText = await response.text();
+				console.error("Failed to update learning status:", response.status, errorText);
+			}
+		} catch (error) {
+			console.error("Failed to update learning status:", error);
+		}
+	};
+
 	// Get unique tools for the dialog
 	const uniqueTools = Array.from(
 		new Map(shortcuts.map((s) => [s.toolInfo.name, s.toolInfo])).values(),
@@ -402,12 +450,11 @@ export default function HomePage() {
 						<ShortcutsList
 							shortcuts={filteredShortcuts}
 							categories={metadata.categories}
-							learningIds={learningIds}
 							onToolClick={handleToolClick}
 							onCategoryClick={handleCategoryClick}
 							onEdit={handleEdit}
 							onDelete={handleDelete}
-							onToggleLearning={toggleLearning}
+							onToggleLearning={handleToggleLearning}
 						/>
 					</main>
 				</div>

@@ -16,6 +16,7 @@ export interface Shortcut {
 	};
 	category: string;
 	configFile?: string;
+	learning?: boolean;
 }
 
 export interface Tool {

@@ -11,7 +11,6 @@ import { ShortcutCard } from "./ShortcutCard";
 interface ShortcutsListProps {
 	shortcuts: SearchableShortcut[];
 	categories: Category[];
-	learningIds: Set<string>;
 	onToolClick?: (tool: string) => void;
 	onCategoryClick?: (category: string) => void;
 	onEdit?: (shortcut: SearchableShortcut) => void;
@@ -24,7 +23,6 @@ type ViewMode = "grid" | "swimlanes";
 export function ShortcutsList({
 	shortcuts,
 	categories,
-	learningIds,
 	onToolClick,
 	onCategoryClick,
 	onEdit,
@@ -128,7 +126,7 @@ export function ShortcutsList({
 						shortcut={item.shortcut}
 						tool={item.toolInfo}
 						category={getCategoryName(item.shortcut.category)}
-						isLearning={learningIds.has(item.shortcut.id)}
+						isLearning={item.shortcut.learning || false}
 						onToolClick={onToolClick}
 						onCategoryClick={onCategoryClick}
 						onEdit={() => onEdit?.(item)}
@@ -174,7 +172,7 @@ export function ShortcutsList({
 											shortcut={item.shortcut}
 											tool={item.toolInfo}
 											category={category.name}
-											isLearning={learningIds.has(item.shortcut.id)}
+											isLearning={item.shortcut.learning || false}
 											onToolClick={onToolClick}
 											onCategoryClick={onCategoryClick}
 											onEdit={() => onEdit?.(item)}
@@ -205,7 +203,7 @@ export function ShortcutsList({
 									<ShortcutCard
 										shortcut={item.shortcut}
 										tool={item.toolInfo}
-										isLearning={learningIds.has(item.shortcut.id)}
+										isLearning={item.shortcut.learning || false}
 										onToolClick={onToolClick}
 										onCategoryClick={onCategoryClick}
 										onEdit={() => onEdit?.(item)}
